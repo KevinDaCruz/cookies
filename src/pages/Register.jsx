@@ -47,13 +47,15 @@ const Register = () => {
       // console.log("Réponse API register :", data);
 
       if (!response.ok) {
-        throw new Error("Une erreur est survenue lors de l'inscription.");
+        const message =
+          data?.message || "Une erreur est survenue lors de l'inscription.";
+        throw new Error(message);
       }
 
       navigate("/connexion");
     } catch (err) {
       console.error("Erreur lors de l'inscription :", err);
-      setError("Une erreur est survenue. Veuillez réessayer.");
+      setError(err.message || "Une erreur est survenue. Veuillez réessayer.");
     }
   };
 
