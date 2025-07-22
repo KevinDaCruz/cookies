@@ -29,7 +29,6 @@ const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(null);
 
     try {
       const response = await fetch(
@@ -47,15 +46,14 @@ const Register = () => {
       const data = await response.json();
       // console.log("Réponse API register :", data);
 
-      if (response.status === 201) {
-        navigate("/connexion");
-      } else if (response.status === 422) {
-        throw new Error(data.message || "Erreur de validation.");
-      } else {
-        throw new Error(data.message || "Une erreur est survenue.");
+      if (!response.ok) {
+        throw new Error("Une erreur est survenue lors de l'inscription.");
       }
+
+      navigate("/connexion");
     } catch (err) {
-      setError(err.message);
+      console.error("Erreur lors de l'inscription :", err);
+      setError("Une erreur est survenue. Veuillez réessayer.");
     }
   };
 
