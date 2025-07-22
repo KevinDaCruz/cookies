@@ -50,7 +50,7 @@ const Register = () => {
       if (response.status === 201) {
         navigate("/connexion");
       } else if (response.status === 422) {
-        throw new Error(messages || "Erreur de validation.");
+        throw new Error(data.message || "Erreur de validation.");
       } else {
         throw new Error(data.message || "Une erreur est survenue.");
       }
