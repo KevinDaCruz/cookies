@@ -54,7 +54,12 @@ const LoginPage = () => {
       navigate("/offres/professionnelles");
     } catch (err) {
       console.error("Erreur lors de la connexion :", err);
-      setError("Une erreur inattendue s'est produite.");
+
+      if (err.message === "Invalid credentials") {
+        setError("Email ou mot de passe incorrect.");
+      } else {
+        setError("Une erreur inattendue s'est produite.");
+      }
     }
     console.log("Login submitted:", formData);
   };
