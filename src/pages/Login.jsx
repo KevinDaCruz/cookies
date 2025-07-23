@@ -28,6 +28,7 @@ const LoginPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError(null);
 
     try {
       const response = await fetch(
@@ -50,6 +51,14 @@ const LoginPage = () => {
         customError.status = response.status;
         throw customError;
       }
+
+      localStorage.setItem(
+        "auth",
+        JSON.stringify({
+          token: data.access_token,
+          expiresAt: new Date(Date.now() + data.expires_in * 1000).toISOString(),
+        })
+      );
 
       navigate("/offres/professionnelles");
     } catch (err) {
