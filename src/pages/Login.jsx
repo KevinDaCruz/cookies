@@ -56,9 +56,13 @@ const LoginPage = () => {
         "auth",
         JSON.stringify({
           token: data.access_token,
-          expiresAt: new Date(Date.now() + data.expires_in * 1000).toISOString(),
+          expiresAt: new Date(
+            Date.now() + data.expires_in * 1000
+          ).toISOString(),
         })
       );
+
+      window.dispatchEvent(new Event("login"));
 
       navigate("/offres/professionnelles");
     } catch (err) {

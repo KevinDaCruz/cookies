@@ -26,15 +26,12 @@ const Logout = () => {
             const { message } = await response.json();
             throw new Error(message || "Échec de la déconnexion côté serveur.");
           }
-        } else {
-          console.error(
-            "Aucun token trouvé, aucune requête envoyée au serveur."
-          );
         }
       } catch (err) {
         console.error("Erreur lors de la déconnexion :", err);
       } finally {
         localStorage.removeItem("auth");
+        window.dispatchEvent(new Event("storage"));
         navigate("/connexion");
       }
     };
