@@ -46,19 +46,19 @@ const LoginPage = () => {
       console.log("Réponse API login :", data);
 
       if (!response.ok) {
-        const message =
-          data?.message || "Une erreur est survenue lors de la connexion.";
-        throw new Error(message);
+        const customError = new Error(data.error || "An error occured.");
+        customError.status = response.status;
+        throw customError;
       }
 
       navigate("/offres/professionnelles");
     } catch (err) {
       console.error("Erreur lors de la connexion :", err);
 
-      if (err.message === "Invalid credentials") {
-        setError("Email ou mot de passe incorrect.");
+      if (err.status === 401) {
+        setError("Identifiants invalides.");
       } else {
-        setError("Une erreur inattendue s'est produite.");
+        setError("Une erreur est survenue lors de la connexion.");
       }
     }
     console.log("Login submitted:", formData);
