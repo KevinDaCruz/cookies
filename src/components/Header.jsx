@@ -1,40 +1,21 @@
 import { Nav, Navbar, Container } from "react-bootstrap";
-import { NavLink } from "react-router";
-import { useEffect, useState } from "react";
+import { NavLink, useLocation } from "react-router";
 import "../assets/styles/Header.css";
-
+import { useEffect, useState } from "react";
 function Header() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const location = useLocation(); // Donne accès à l'URL courante ; change à chaque navigation
+
+  const getValidToken = () => {
+    const auth = JSON.parse(localStorage.getItem("auth"));
+    const isValid = auth && new Date(auth.expiresAt) > new Date();
+    return isValid;
+  };
+
+  const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {
-    const checkLogin = () => {
-      const auth = localStorage.getItem("auth");
-      if (auth) {
-        try {
-          const { token, expiresAt } = JSON.parse(auth);
-          if (token) {
-            setIsLoggedIn(true);
-          } else {
-            setIsLoggedIn(false);
-          }
-        } catch (e) {
-          setIsLoggedIn(false);
-        }
-      } else {
-        setIsLoggedIn(false);
-      }
-    };
-
-    checkLogin();
-
-    window.addEventListener("storage", checkLogin);
-    window.addEventListener("login", checkLogin);
-
-    return () => {
-      window.removeEventListener("storage", checkLogin);
-      window.removeEventListener("login", checkLogin);
-    };
-  }, []);
+    setIsConnected(getValidToken());
+  }, [location]);
 
   return (
     <Navbar bg="light" data-bs-theme="light">
@@ -49,8 +30,11 @@ function Header() {
           <Nav.Link as={NavLink} to="/offres/professionnelles">
             Offres Professionnelles
           </Nav.Link>
-
-          {!isLoggedIn && (
+          {isConnected ? (
+            <Nav.Link as={NavLink} to="/deconnexion">
+              Déconnexion
+            </Nav.Link>
+          ) : (
             <>
               <Nav.Link as={NavLink} to="/inscription">
                 Inscription
@@ -60,16 +44,9 @@ function Header() {
               </Nav.Link>
             </>
           )}
-
-          {isLoggedIn && (
-            <Nav.Link as={NavLink} to="/deconnexion">
-              Déconnexion
-            </Nav.Link>
-          )}
         </Nav>
       </Container>
     </Navbar>
   );
 }
-
 export default Header;

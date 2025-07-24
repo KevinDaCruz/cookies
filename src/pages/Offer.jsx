@@ -11,19 +11,14 @@ const Offer = () => {
   useEffect(() => {
     const fetchOffer = async () => {
       try {
-        const authData = JSON.parse(localStorage.getItem("auth"));
-        const token = authData?.token;
-
-        if (!token) {
-          throw { status: 401, message: "Token manquant ou invalide." };
-        }
-
         const response = await fetch(
           `https://offers-api.digistos.com/api/offers/${id}`,
           {
             headers: {
               Accept: "application/json",
-              Authorization: `Bearer ${token}`,
+              Authorization: `Bearer ${
+                JSON.parse(localStorage.getItem("auth"))?.token
+              }`,
             },
           }
         );

@@ -7,8 +7,8 @@ const Logout = () => {
   useEffect(() => {
     const handleLogout = async () => {
       try {
-        const authData = JSON.parse(localStorage.getItem("auth"));
-        const token = authData?.token;
+        const auth = JSON.parse(localStorage.getItem("auth"));
+        const token = auth?.token;
 
         if (token) {
           const response = await fetch(
@@ -16,30 +16,33 @@ const Logout = () => {
             {
               method: "POST",
               headers: {
-                Authorization: `Bearer ${token}`,
                 Accept: "application/json",
+                Authorization: `Bearer ${token}`,
               },
             }
           );
 
           if (!response.ok) {
-            const { message } = await response.json();
-            throw new Error(message || "Échec de la déconnexion côté serveur.");
+            const datas = await response.json();
+            throw new Error(
+              `HTTP error: ${datas.message} (status: ${response.status})`
+            );
           }
+        } else {
+          throw new Error("Missing Token");
         }
-      } catch (err) {
-        console.error("Erreur lors de la déconnexion :", err);
+      } catch (error) {
+        console.error(error.message);
       } finally {
         localStorage.removeItem("auth");
-        window.dispatchEvent(new Event("storage"));
         navigate("/connexion");
       }
     };
 
     handleLogout();
-  }, [navigate]);
+  }, []);
 
-  return null;
+  return null; // Pas besoin d'afficher quoi que ce soit
 };
 
 export default Logout;
