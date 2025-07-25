@@ -15,7 +15,6 @@ const LoginPage = () => {
     email: "",
     password: "",
   });
-
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
@@ -35,33 +34,40 @@ const LoginPage = () => {
         {
           method: "POST",
           headers: {
-            "Content-Type": "application/json",
             Accept: "application/json",
+            "Content-Type": "application/json",
           },
           body: JSON.stringify(formData),
+          credentials: "include",
         }
       );
 
-      const data = await response.json();
-      console.log("Réponse API login :", data);
+      const datas = await response.json();
 
       if (!response.ok) {
-        const customError = new Error(data.error || "An error occured.");
+        const customError = new Error(datas.error || "An error occured.");
         customError.status = response.status;
         throw customError;
       }
 
-      navigate("/offres/professionnelles");
-    } catch (err) {
-      console.error("Erreur lors de la connexion :", err);
+      localStorage.setItem(
+        "auth",
+        JSON.stringify({
+          expiresAt: new Date(
+            Date.now() + datas.expires_in * 1000
+          ).toISOString(),
+        })
+      );
 
-      if (err.status === 401) {
+      navigate("/offres/professionnelles");
+    } catch (error) {
+      console.error(`Error: ${error.message} (${error.status})`);
+      if (error.status === 401) {
         setError("Identifiants invalides.");
       } else {
         setError("Une erreur est survenue lors de la connexion.");
       }
     }
-    console.log("Login submitted:", formData);
   };
 
   return (
@@ -70,17 +76,7 @@ const LoginPage = () => {
         <Col xs={12} sm={8} md={6} lg={4}>
           <Card className="p-4 shadow-lg">
             <h1 className="text-center mb-4">Se connecter</h1>
-
-            {error && (
-              <Alert
-                variant="danger"
-                onClose={() => setError(null)}
-                dismissible
-              >
-                {error}
-              </Alert>
-            )}
-
+            {error && <Alert variant="danger">{error}</Alert>}
             <Form onSubmit={handleSubmit}>
               <Form.Group className="mb-3" controlId="loginEmail">
                 <Form.Label>Email</Form.Label>

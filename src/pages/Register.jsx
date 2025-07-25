@@ -16,8 +16,8 @@ const Register = () => {
     name: "",
     password: "",
   });
-
   const [error, setError] = useState(null);
+
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -29,33 +29,34 @@ const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    // Handle signup logic here
+    // Don't forget to handle errors, both for yourself (dev) and for the client (via a Bootstrap Alert)
     try {
       const response = await fetch(
         "https://offers-api.digistos.com/api/auth/register",
         {
           method: "POST",
           headers: {
-            "Content-Type": "application/json",
             Accept: "application/json",
+            "Content-Type": "application/json",
           },
           body: JSON.stringify(formData),
         }
       );
 
-      const data = await response.json();
-      // console.log("Réponse API register :", data);
-
       if (!response.ok) {
-        const message =
-          data?.message || "Une erreur est survenue lors de l'inscription.";
-        throw new Error(message);
+        const datas = await response.json();
+        throw new Error(
+          `HTTP error: ${datas.message} (status: ${response.status})`
+        );
       }
-
+      // Redirect to Login on success
       navigate("/connexion");
-    } catch (err) {
-      console.error("Erreur lors de l'inscription :", err);
-      setError("Une erreur est survenue. Veuillez réessayer.");
+    } catch (error) {
+      console.error(error.message);
+      setError(
+        "Veuillez vérifier que l'ensemble de champs sont remplis et que le mot de passe contient huit caractères."
+      );
     }
   };
 
@@ -65,17 +66,7 @@ const Register = () => {
         <Col xs={12} sm={8} md={6} lg={4}>
           <Card className="p-4 shadow-lg">
             <h1 className="text-center mb-4">Créer un compte</h1>
-
-            {error && (
-              <Alert
-                variant="danger"
-                onClose={() => setError(null)}
-                dismissible
-              >
-                {error}
-              </Alert>
-            )}
-
+            {error && <Alert variant="danger">{error}</Alert>}
             <Form onSubmit={handleSubmit}>
               <Form.Group className="mb-3" controlId="formEmail">
                 <Form.Label>Email</Form.Label>
